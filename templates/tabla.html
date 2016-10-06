@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" >
+    <script   src="https://code.jquery.com/jquery-3.1.0.js"   integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="   crossorigin="anonymous"></script>
+    <script type="text/javascript" >
+        function funcion() {
+            depa = $('#comboDepa option:selected').val();
+            pro = $('#comboPro option:selected').val();
+            dis = $('#comboDis option:selected').val();
+            alert(depa);
+            $.ajax({
+                type : 'GET',
+	    		dataType : 'text',
+                url : '/obtenerdata2/'+depa+pro+dis,
+                success : function(result)
+                {
+                    var json2 = jQuery.parseJSON(result);
+                    $.each(json2, function(j, result2)
+                    {
+                        $('#comboPro').append($('<option>').text(result2.zona).attr('value', result2.zona));
+                    });
+                },
+                error : function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + ' ' + thrownError);
+                }
+            });
+            funcion2(depa,pro,dis);
+        }
+
+        function funcion2(depa, pro, dis) {
+            $.ajax({
+                type : 'GET',
+	    		dataType : 'text',
+                url : '/obtenerdata2/'+depa+pro+dis,
+                success : function(result)
+                {
+                    var json2 = jQuery.parseJSON(result);
+                    $.each(json2, function(j, result2)
+                    {
+                        $('#comboPro').append($('<option>').text(result2.zona).attr('value', result2.zona));
+                    });
+                },
+                error : function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + ' ' + thrownError);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1 style="color:blue" align="center">
+        SISTEMA DE SEGMENTACIÓN DEL CENSO DE POBLACIÓN Y VIVIENDA 2017
+    </h1>
+    <ul>
+        <table style="width:100%">
+                <tr>
+                    <th>DEPARTAMENTO</th>
+                    <th>
+                        <select id="comboDepa">
+                            <option value="2">TODOS</option>
+                            {% for p in mnz %}
+                                    <option value="2">{{ p.ubigeo }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>PROVINCIA</th>
+                    <th>
+                        <select id="comboPro">
+                            <option value="06">TODOS</option>
+                            {% for p in filtroDepa %}
+                                    <option value="06">{{ p.ubigeo }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>DISTRITO</th>
+                    <th>
+                        <select id="comboDis">
+                            <option value="01">TODOS</option>
+                            {% for p in mnz %}
+                                    <option value="01">{{ p.ubigeo }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <th>AREA</th>
+                    <th>
+                        <select>
+                            <option value="0">URBANA</option>
+                            <option value="1">RURAL</option>
+                        </select>
+                    </th>
+                </tr>
+        </table>
+        <table  align="left">
+            <th>ZONA/AER</th>
+            <th>
+                <select>
+                    <option value="0">TODOS</option>
+                     {% for p in mnz %}
+                         <option value="volvo">{{ p.ubigeo }}</option>
+                     {% endfor %}
+                </select>
+             </th>
+             <th>
+                 <button onclick="funcion();">PROCESAR</button>
+            </th>
+        </table>
+    </ul>
+    <ul>
+            <table style="width:100%">
+                <tr>
+                    <th>DEPARTAMENTO</th>
+                    <th>PROVINCIA</th>
+                    <th>DISTRITO</th>
+                    <th>ZONA / AER</th>
+                    <th>Nro. de secciones</th>
+                    <th>Nro. de AEU</th>
+                    <th>Estado</th>
+                    <th>DESCARGAR</th>
+                </tr>
+                {% for p in mnz %}
+                    <tr>
+                        <td> {{ p.ubigeo }}</td>
+                        <td> {{ p.zona }}</td>
+                        <td> {{ p.aeu }}</td>
+                        <td> {{ p.aeu_viv }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+    </ul>
+</body>
+</html>

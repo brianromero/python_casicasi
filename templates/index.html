@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--{% load staticfiles %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" >
+    <script   src="https://code.jquery.com/jquery-3.1.0.js"   integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="   crossorigin="anonymous"></script>
+    <!--<script type="text/javascript" >
+
+        $(document).ready(function() {
+            combo();
+            actualizarTabla();
+        });
+
+        function combo() {
+            var tipo=0;
+            var depa = 0;
+            var pro = 0;
+            var dis = 0;
+            var zona = 0;
+            var ubigeo = 0;
+            if ($("#comboDepa option:selected").val()!=0) {
+                depa = $("#comboDepa option:selected").val();
+                tipo = 1;
+                if ($("#comboPro option:selected").val() != 0){
+                    pro = $("#comboPro option:selected").val();
+                    tipo = 2;
+                    if ($("#comboDis option:selected").val() != 0){
+                        dis = $("#comboDis option:selected").val();
+                        tipo = 3;
+                        if($("#comboZona option:selected").val() != 0){
+                            zona = $("#comboZona option:selected").val();
+                            tipo = 4;
+                        }
+                    }
+                }
+            }
+            ubigeo = depa + pro + dis;
+            switch(tipo){
+                case 0:
+                    url_aux = 'segrecargaDepa/';
+                    break;
+                case 1:
+                    url_aux = 'segrecargaProv/'+depa+'/'+pro+'/';
+                    break;
+                case 2:
+                    url_aux = 'segrecargaDis/'+depa+'/'+pro+'/'+dis+'/';
+                    break;
+                case 3:
+                    url_aux = 'segrecargaZona/'+ubigeo+'/';
+                    break;
+                default:
+                    break;
+            }
+            $.ajax({
+                type : 'GET',
+                dataType : 'text',
+                url : url_aux,
+                success : function(result)
+                {
+                    var json2 = jQuery.parseJSON(result);
+                    if(tipo==0){
+                        $('#comboDepa').children().remove()
+                        eval("$('#comboDepa').append('<option value=0>TODOS</option>');");
+                        $.each(json2, function(j, result2)
+                        {
+                            $('#comboDepa').append($('<option>').text(result2.departamento).attr('value', result2.ccdd));
+                        });
+                    }
+                    if(tipo==1){
+                        $('#comboPro').children().remove()
+                        eval("$('#comboPro').append('<option value=0>TODOS</option>');");
+                        $.each(json2, function(j, result2)
+                        {
+                            $('#comboPro').append($('<option>').text(result2.provincia).attr('value', result2.ccpp));
+                        });
+                    }
+                    if(tipo==2){
+                        $('#comboDis').children().remove()
+                        eval("$('#comboDis').append('<option value=0>TODOS</option>');");
+                        $.each(json2, function(j, result2)
+                        {
+                            $('#comboDis').append($('<option>').text(result2.distrito).attr('value', result2.ccdi));
+                        });
+                    }
+                    if(tipo==3){
+                        $('#comboZona').children().remove()
+                        eval("$('#comboZona').append('<option value=0>TODOS</option>');");
+                        $.each(json2, function(j, result2)
+                        {
+                            $('#comboZona').append($('<option>').text(result2.zona).attr('value', result2.ubigeo));
+                        });
+                    }
+                },
+                error : function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + ' ' + thrownError);
+                }
+            });
+        }
+
+        function actualizarTabla(){
+            var depa = 0;
+            var pro = 0;
+            var dis = 0;
+            var zona = 0;
+            var ubigeo = 0;
+            var html = '';
+            html+='<br/>';
+            html+='<table width="100%" border="1">';
+            html+='	<thead >';
+            html+='		<tr>';
+            html+='        <th>DEPARTAMENTO</th>';
+            html+='        <th>PROVINCIA</th>';
+            html+='        <th>DISTRITO</th>';
+            html+='        <th>ZONA</th>';
+            html+='        <th>SECCION</th>';
+            html+='        <th>NRO. DE AEU</th>';
+            html+='        <th>ESTADO</th>';
+            html+='    </tr>';
+			html+='	</thead >';
+			html+=' <tbody >';
+            if ($("#comboDepa option:selected").val()!=0){
+                depa = $("#comboDepa option:selected").val();
+                if ($("#comboPro option:selected").val() != 0){
+                  pro = $("#comboPro option:selected").val();
+                  if ($("#comboDis option:selected").val() != 0){
+                    dis = $("#comboDis option:selected").val();
+                    ubigeo=depa+pro+dis;
+                    if ($("#comboZona option:selected").val() != 0){
+                        zona = $("#comboZona option:selected").val();
+                    }
+                  }
+                }
+            }
+            $.ajax({
+                type : 'GET',
+                dataType : 'text',
+                url : 'segrecargaTabla/'+ubigeo+'/'+zona+'/',
+                success : function(result)
+                {
+                    var json2 = jQuery.parseJSON(result);
+                    $.each(json2, function(j, result2)
+                    {
+                        html+='    <td>'+result2.departamento+'</td>'
+                        html+='    <td>'+result2.provincia+'</td>'
+                        html+='    <td>'+result2.distrito+'</td>'
+                        html+='    <td align="center">'+result2.zona+'</td>'
+                        html+='    <td align="center">'+result2.seccion+'</td>'
+                        html+='    <td align="center">'+result2.nro_aeu+'</td>'
+                        html+='    <td align="center">'+result2.estado_seg+'</td>'
+                        html+='  </tr>'
+                    })
+                    html+=' </tbody > '
+                    html+='</table>'
+                    $('#tabla').html(html)
+                }
+            })
+        }
+
+        function comboDepa() {
+            $('#comboPro').children().remove()
+            eval("$('#comboPro').append('<option value=0>TODOS</option>');")
+            $('#comboDis').children().remove()
+            eval("$('#comboDis').append('<option value=0>TODOS</option>');")
+            $('#comboZona').children().remove()
+            eval("$('#comboZona').append('<option value=0>TODOS</option>');")
+            combo()
+            actualizarTabla()
+        }
+
+        function comboPro() {
+            $('#comboDis').children().remove()
+            eval("$('#comboDis').append('<option value=0>TODOS</option>');")
+            $('#comboZona').children().remove()
+            eval("$('#comboZona').append('<option value=0>TODOS</option>');")
+            combo()
+            actualizarTabla()
+        }
+
+        function comboDis() {
+            $('#comboZona').children().remove()
+            eval("$('#comboZona').append('<option value=0>TODOS</option>');")
+            combo()
+            actualizarTabla()
+        }
+
+        function comboZona() {
+            combo()
+            actualizarTabla()
+        }
+   </script>-->
+</head>
+<body>
+    <!--<h1 style="color:#0e0cff" align="center">
+        SISTEMA DE SEGMENTACIÓN DEL CENSO DE POBLACIÓN Y VIVIENDA 2017
+    </h1>
+    <ul>
+        <table style="width:100%">
+                <tr>
+                    <th>DEPARTAMENTO</th>
+                    <th>
+                        <select id="comboDepa" onchange="comboDepa()">
+                            <option value="0">TODOS</option>
+                        </select>
+                    </th>
+                    <th>PROVINCIA</th>
+                    <th>
+                        <select id="comboPro" onchange="comboPro()">
+                            <option value="0">TODOS</option>
+                        </select>
+                    </th>
+                    <th>DISTRITO</th>
+                    <th>
+                        <select id="comboDis" onchange="comboDis()">
+                            <option value="0">TODOS</option>
+                        </select>
+                    </th>
+                    <th>AREA</th>
+                    <th>
+                        <select id="comboArea" onchange="comboArea()">
+                            <option value="0">URBANA</option>
+                            <option value="1">RURAL</option>
+                        </select>
+                    </th>
+                    <th>ZONA/AER</th>
+                    <th>
+                        <select id="comboZona" onchange="comboZona()">
+                            <option value="0">TODOS</option>
+                        </select>
+                    </th>
+                    <th>
+                        <button onclick="funcion();">PROCESAR</button>
+                    </th>
+                </tr>
+        </table>
+    </ul>
+    <tr>
+        <td >
+            <hr></hr>
+        </td>
+    </tr>
+    <ul>
+           <td>
+               <div>
+                   <div id="tabla"></div>
+               </div>
+           </td>
+    </ul>-->
+</body>
+</html>
